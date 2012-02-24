@@ -10,8 +10,7 @@ from dploi_fabric.utils import config
 def reload_nginx():
     run('sudo /etc/init.d/nginx reload')
     
-@task
-def update_config_file():
+def gen_config_file():
     output = ""
     template_name = 'templates/nginx/nginx.conf'
     for site, site_config in config.sites.items():
@@ -22,5 +21,10 @@ def update_config_file():
         })
 
         output += render_template(template_name, context_dict)
+    return output
+    
+@task
+def update_config_file():
+    output = gen_config_file()
     put(StringIO.StringIO(output), '%(path)s/../config/nginx.conf' % env)
     reload_nginx()

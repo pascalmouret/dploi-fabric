@@ -215,6 +215,7 @@ class Configuration(object):
         Can also be used to output warnings to the user, if he is using an old deployments.py
         format.
         """
+        
         deployment_dict = {
             # Old settings
             'servername': env_dict.get("host_string"),
@@ -264,6 +265,16 @@ class Configuration(object):
         else:
             raise Exception("Invalid domain format")
         deployment_dict.update({'domains': domains})
+        
+        tmp_dict = {}
+        for redirect in deployment_dict['domains_redirect']:
+            split = redirect['domain'].partition('/')
+            sub_dict = {'src':'/%s' % split[2],'dest':redirect['destination_domain']}
+            if tmp_dict.has_key(split[0]):
+                tmp_dict[split[0]].append(sub_dict)
+            else:
+                tmp_dict[split[0]] = [sub_dict,]
+        deployment_dict['domains_redirect'] = tmp_dict
 
         ###############
         # Celery dict #

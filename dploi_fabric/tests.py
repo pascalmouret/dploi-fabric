@@ -2,6 +2,7 @@ import ConfigParser
 import StringIO
 import unittest
 from dploi_fabric.utils import EnvConfigParser, Configuration, _AttributeDict, STATIC_COLLECTED
+import nginx
 
 class TestConfigurationTestCase(unittest.TestCase):
     test_config = """
@@ -36,6 +37,21 @@ cmd = bin/django
                 'main': ['main.domain.tld'],
                 'multisite1': ['multisite1.domain.tld'],
             },
+            'domains_redirect': [
+                {
+                    'domain': 'sitename.com/fr/',
+                    'destination_domain': 'www.sitename.com/french/'
+                },{
+                    'domain': 'sitename.com/de/',
+                    'destination_domain': 'www.sitename.com/german/'
+                },{
+                    'domain': 'othersitename.com/stupid/long/path',
+                    'destination_domain': 'debug.org/stupid'
+                },{
+                    'domain': 'andonemoredomain.cu',
+                    'destination_domain': 'www.thatswhatshesaid.com'
+                }
+            ],
             'celery': {
                 'concurrency': 32,
             }
@@ -63,6 +79,11 @@ enabled=true""", self.env_dict)
 
     def test_static(self):
         self.assertEqual(self.sites["main"].get("static").get("/static/"), STATIC_COLLECTED)
+        
+    def test_domain_redirect_dictionary(self):
+        config = self.sites['main']
+        from pprint import pprint
+        pprint(config)
 
 
 
